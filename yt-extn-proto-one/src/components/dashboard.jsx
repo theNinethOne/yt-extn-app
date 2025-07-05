@@ -1,99 +1,64 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { pb } from "../pb";
+import { useEffect, useState } from "react"
+import { pb } from "../pb"
 
-export default function Dashboard() {
-  const navigate = useNavigate();
-  const [renderData, setRenderData] = useState();
+export default function Dashboard ( { videoId } ) {
 
-  async function injectScript(tabId) {
-    await chrome.scripting.executeScript({
-      target: { tabId },
-      files: ["script.js"],
-    });
-  }
+  const [ video, setVideo] = useState()
+  const [ segments, setSegments ] = useState()
 
-  async function getYTData(type) {
-    const [tab] = await chrome.tabs.query({
-      active: true,
-      currentWindow: true,
-    });
-
-    await injectScript(tab.id);
-
+  const getCurrrentVideoData = async ( videoId ) => {
 
     try {
-        const response = await new Promise((resolve, reject) => {
-          chrome.tabs.sendMessage(tab.id, { type }, (response) => {
-            if (chrome.runtime.lastError) {
-              return reject(chrome.runtime.lastError);
-            }
-            resolve(response);
-          });
-        });
-  
-        if (response && response.type === "YOUTUBE_METADATA") {
-          setRenderData(response.data);
-          console.log("Received YouTube Data:", response.data);
-        } else {
-          console.log("No valid YOUTUBE_METADATA response from script.js.");
-        }
-      } catch (error) {
-        console.error("Error sending message or receiving response:", error);
-      }
+      
+      const videoData = await pb.collection("videos").getFirstListItem(`videoId="${videoId}"`)
+      setVideo(videoData)
+      
+      await new Promise((res) => setTimeout(res, 300))
 
-    // chrome.tabs.sendMessage(tab.id, { type }, (response) => {
-    //   response
-    //     ? console.log(response)
-    //     : console.log(" No response from script.js ");
-    // });
+      console.log(pb.authStore.record?.id, videoData.id)
+      
+      const segmentData = await pb.collection("segments").getList(1,30,{filter: `video="${videoData.id}" && user="${pb.authStore.record?.id}"`})
 
-    // chrome.runtime.onMessage.addListener(function recieveYTData(
-    //   msg,
-    //   sender,
-    //   res
-    // ) {
-    //   if (msg.type === "YOUTUBE_METADATA") {
-    //     setRenderData(msg.data);
-    //     chrome.runtime.onMessage.removeListener(recieveYTData);
-    //   }
-    // });
+      console.log(segmentData)
+      setSegments(segmentData.items)
+
+    } catch (e) {
+      console.log(" videoData error", e)
+    }
+
   }
 
-  return (
+  useEffect( () => {
+    if ( videoId ){
+      getCurrrentVideoData( videoId)
+    }
+  }, [ videoId ] )
+  
+  return(
     <>
-     
-      <button className="bg-red-500" onClick={() => navigate("/tabsDash")}>
-        TABS
-      </button>
-      Dashboard page
-      <button onClick={() => getYTData("GET_DATA")}>Get YT Data</button>
+    <div>
+      { video ? <div>{ video.videoTitle }</div> : <div>Loading...</div> }
       <div>
-        {renderData && renderData.videoTitle && (
-          <div>
-            <h3>{renderData.videoTitle}</h3>
-            <p>
-              <strong>Channel:</strong> {renderData.channelName}
-            </p>
-            <p>
-              <strong>Video ID:</strong> {renderData.videoId}
-            </p>
-            <p>
-              <strong>Current Time:</strong>{" "}
-              {Math.floor(renderData.currentVideoTime)} sec
-            </p>
-            <p>
-              <strong>Duration:</strong> {Math.floor(renderData.videoDuration)}{" "}
-              sec
-            </p>
-            <img
-              src={renderData.thumbnailUrl}
-              alt="thumbnail"
-              style={{ width: "100%", borderRadius: "6px" }}
-            />
-          </div>
-        )}
+        { segments ? segments.map( (segment) => (
+           <SegRender key={segment.id} segmentTitle={segment.segmentTitle} startTime={segment.startTime} endTime={segment.endTime} />
+        )
+        ) : <div>Loading...</div> }
       </div>
+    </div>
     </>
-  );
+  )
+}
+
+function SegRender( { segmentTitle, startTime, endTime } ) {
+
+  const duration = endTime - startTime
+
+  return<>
+  <div className="flex flex-row h-[50px] w-[200px] p-2 m-1 rounded-lg border-2 border-red-500 bg-black text-red-500 hover:bg-red-500 hover:text-black hover:scale-105 transition-all duration-300 ease-in-out">
+    <div>P</div>
+    <div>{segmentTitle}</div>
+    <div>{duration}</div>
+    <div>X</div>
+  </div>
+  </>
 }

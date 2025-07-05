@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { pb } from "../pb";
 import { useSegment } from "../hooks/useSegment";
 import AddSegmentModal from "./addSegmentModal";
+import Dashboard from "./dashboard";
 
 export default function TabsDash() {
   const navigate = useNavigate();
@@ -106,24 +107,6 @@ export default function TabsDash() {
     console.log("Video already exists, skipping creation.");
   }
 
-    // try {
-    //   let isVideoExisting = null;
-
-    //   isVideoExisting = await pb
-    //     .collection("videos")
-    //     .getFirstListItem(`videoId="${render?.videoId}"`);
-
-    //   if ( !isVideoExisting && data) {
-    //     console.log("..................")
-    // console.log("video data2", data);
-    // console.log("isVideoExisting", isVideoExisting);
-
-    //     const record = await pb.collection("videos").create(data);
-    //     console.log("video record created successfully. Record - ", record);
-    //   }
-    // } catch (e) {
-    //   console.log("video record creation failed", e);
-    // }
   };
 
   useEffect(() => {
@@ -261,13 +244,7 @@ export default function TabsDash() {
 
         {activeTab === "dashboard" && (
           <div className="p-2 rounded-lg bg-gray-50 dark:bg-gray-800 w-[300px]">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              This is some placeholder content for the{" "}
-              <strong className="font-medium text-gray-800 dark:text-white">
-                Dashboard tab
-              </strong>
-              .
-            </p>
+            <Dashboard videoId={render?.videoId} />
           </div>
         )}
 
