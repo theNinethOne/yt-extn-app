@@ -19,9 +19,9 @@ export default function TabsDash() {
     const currentTime = await segmentHandler();
 
     if (isSegmenting) {
-      setEndTime( Math.trunc(currentTime.currentVideoTime));
+      setEndTime(Math.trunc(currentTime.currentVideoTime));
     } else {
-      setStartTime( Math.trunc(currentTime.currentVideoTime));
+      setStartTime(Math.trunc(currentTime.currentVideoTime));
       setEndTime(null);
     }
 
@@ -66,9 +66,75 @@ export default function TabsDash() {
     }
   }
 
+  const addVideoToPlaylist = async (render) => {
+
+    const data = {
+      videoUrl: render.videoUrl,
+      videoId: render.videoId,
+      videoTitle: render.videoTitle,
+      channelName: render.channelName,
+      videoDuration: render.videoDuration,
+      thumbnailUrl: render.thumbnailUrl,
+    };
+
+
+
+    let isVideoExisting = false;
+
+  try {
+    await pb
+      .collection("videos")
+      .getFirstListItem(`videoId="${render?.videoId}"`);
+    isVideoExisting = true; 
+  } catch (e) {
+    if (e.status === 404) {
+      isVideoExisting = false;
+    } else {
+      console.error("Error while checking for existing video:", e);
+      return;
+    }
+  }
+
+  if (!isVideoExisting && data) {
+    try {
+      const record = await pb.collection("videos").create(data);
+      console.log("Video record created successfully:", record);
+    } catch (e) {
+      console.error("Video record creation failed:", e);
+    }
+  } else {
+    console.log("Video already exists, skipping creation.");
+  }
+
+    // try {
+    //   let isVideoExisting = null;
+
+    //   isVideoExisting = await pb
+    //     .collection("videos")
+    //     .getFirstListItem(`videoId="${render?.videoId}"`);
+
+    //   if ( !isVideoExisting && data) {
+    //     console.log("..................")
+    // console.log("video data2", data);
+    // console.log("isVideoExisting", isVideoExisting);
+
+    //     const record = await pb.collection("videos").create(data);
+    //     console.log("video record created successfully. Record - ", record);
+    //   }
+    // } catch (e) {
+    //   console.log("video record creation failed", e);
+    // }
+  };
+
   useEffect(() => {
     getYoutubeData("GET_DATA");
   }, []);
+
+  useEffect(() => {
+    if (render) {
+      addVideoToPlaylist(render);
+    }
+  }, [render]);
 
   return (
     <>
