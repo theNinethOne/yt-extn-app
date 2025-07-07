@@ -1,7 +1,14 @@
 import { useState } from "react";
 import { pb } from "../pb";
 
-export default function AddSegmentModal({ startTime, endTime, videoId }) {
+export default function AddSegmentModal({
+  startTime,
+  endTime,
+  videoId,
+  setStartTime,
+  setEndTime,
+  setIsSegmenting,
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const [segmentTitle, setSegmentTitle] = useState("");
 
@@ -26,6 +33,9 @@ export default function AddSegmentModal({ startTime, endTime, videoId }) {
       const record = await pb.collection("segments").create(data);
       console.log("segment record created successfully");
       setIsOpen(false);
+      setStartTime(null);
+      setEndTime(null);
+      setIsSegmenting(false);
     } catch (e) {
       console.log("segment record creation failed", e);
     }

@@ -16,6 +16,12 @@ export default function TabsDash() {
   const [startTime, setStartTime] = useState(null);
   const [endTime, setEndTime] = useState(null);
 
+  function refreshUponSubmit() {
+    setStartTime(null);
+      setEndTime(null);
+      setIsSegmenting(false);
+  }
+
   async function getSegment() {
     const currentTime = await segmentHandler();
 
@@ -236,6 +242,9 @@ export default function TabsDash() {
                   startTime={startTime}
                   endTime={endTime}
                   videoId={render?.videoId}
+                  setStartTime={setStartTime}
+                  setEndTime={setEndTime}
+                  setIsSegmenting={setIsSegmenting}
                 />
               )}
             </div>

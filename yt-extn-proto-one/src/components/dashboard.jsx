@@ -38,7 +38,7 @@ export default function Dashboard ( { videoId } ) {
     <>
     <div>
       { video ? <div>{ video.videoTitle }</div> : <div>Loading...</div> }
-      <div>
+      <div className="flex flex-col justify-center items-center">
         { segments ? segments.map( (segment) => (
            <SegRender key={segment.id} segmentTitle={segment.segmentTitle} startTime={segment.startTime} endTime={segment.endTime} />
         )
@@ -54,11 +54,11 @@ function SegRender( { segmentTitle, startTime, endTime } ) {
   const duration = endTime - startTime
 
   return<>
-  <div className="flex flex-row h-[50px] w-[200px] p-2 m-1 rounded-lg border-2 border-red-500 bg-black text-red-500 hover:bg-red-500 hover:text-black hover:scale-105 transition-all duration-300 ease-in-out">
-    <div>P</div>
-    <div>{segmentTitle}</div>
-    <div>{duration}</div>
-    <div>X</div>
+  <div className="group flex flex-row justify-between items-center h-[50px] w-[250px] p-2 m-2 rounded-lg space-x-2 text-white font-mono text-xl scroll-auto hover:bg-red-500 hover:text-black hover:scale-105 transition-all duration-300 ease-in-out">
+    <div className="flex justify-between items-center h-[40px] w-[40px] p-2 m-1 rounded-lg bg-slate-600 group-hover:bg-red-500 group-hover:text-black group-hover:scale-105 transition-all duration-300 ease-in-out">P</div>
+    <div className="flex justify-between items-center h-[40px] w-[150px] p-2 m-1 rounded-lg overflow-hidden text-white font-mono bg-slate-600 group-hover:bg-red-500 group-hover:text-black group-hover:scale-105 transition-all duration-300 ease-in-out">{segmentTitle}</div>
+    <div className="flex justify-between items-center h-[40px] w-[40px] p-2 m-1 rounded-lg bg-slate-600 group-hover:bg-red-500 group-hover:text-black group-hover:scale-105 transition-all duration-300 ease-in-out">{duration}</div>
+    <div className="flex justify-between items-center h-[40px] w-[40px] p-2 m-1 rounded-lg bg-slate-600 group-hover:bg-red-500 group-hover:text-black group-hover:scale-105 transition-all duration-300 ease-in-out">X</div>
   </div>
   </>
 }
