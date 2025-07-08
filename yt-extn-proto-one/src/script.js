@@ -66,4 +66,15 @@ chrome.runtime.onMessage.addListener( (request, sender, sendResponse) => {
         return true
     }
 
+    if ( currentTabUrl.includes("youtube.com") && request.type === "SEEK_TO_TIME") {
+        const player = document.querySelector("video");
+        if (player) {
+          player.currentTime = request.time;
+          player.play();
+          sendResponse({ success: true });
+        } else {
+          sendResponse({ success: false, error: "Video player not found" });
+        }
+      }
+
 })
