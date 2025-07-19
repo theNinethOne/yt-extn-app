@@ -77,4 +77,11 @@ chrome.runtime.onMessage.addListener( (request, sender, sendResponse) => {
         }
       }
 
+      if ( currentTabUrl.includes("youtube.com") && request.type === "GET_CURRENT_TIME" ) {
+        const video = document.querySelector("video");
+        const currentVideoTime = video?.currentTime ?? 0
+        sendResponse({ type : "CURRENT_TIME", data : currentVideoTime });
+        return true
+    }
+
 })

@@ -31,7 +31,7 @@ export function useYoutubeMetadata() {
         } catch (err) {
           console.error("Error getting metadata:", err);
         }
-    }, 500), // debounce 500ms
+    }, 500),
     []
   );
 

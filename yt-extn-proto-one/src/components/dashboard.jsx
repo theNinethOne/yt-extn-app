@@ -2,11 +2,15 @@ import { useEffect, useState } from "react";
 import { pb } from "../pb";
 import { useSkipToTime } from "../hooks/useSkipToTime";
 import captureImg from "../assets/Capture.jpg";
+import { useGetCurrentTime } from "../hooks/useGetCurrentTime";
 
 export default function Dashboard({ videoId }) {
   const [video, setVideo] = useState();
   const [segments, setSegments] = useState();
   const { skipToTime } = useSkipToTime();
+  const { currentVIdeoTime } = useGetCurrentTime();
+
+  console.log(currentVIdeoTime);
 
   const getCurrrentVideoData = async (videoId) => {
     try {
@@ -36,6 +40,35 @@ export default function Dashboard({ videoId }) {
       getCurrrentVideoData(videoId);
     }
   }, [videoId]);
+
+  function skipToNextSegment() {
+    if (segments && segments.length > 0) {
+      if (currentVIdeoTime <= segments[0].startTime) {
+        skipToTime(segments[0].startTime);
+        console.log("c1");
+      } else if (currentVIdeoTime >= segments[segments.length - 1].endTime) {
+        skipToTime(video.videoDuration);
+        console.log("c2");
+      } else {
+        for (let i = 0; i < segments.length; i++) {
+          if (
+            currentVIdeoTime >= segments[i].endTime &&
+            currentVIdeoTime <= segments[i + 1].startTime
+          ) {
+            skipToTime(segments[i + 1].startTime);
+            console.log("c3");
+            break;
+          }
+        }
+      }
+    } else {
+      console.log("No segments found.");
+    }
+  }
+
+  useEffect(() => {
+    skipToNextSegment();
+  }, [currentVIdeoTime]);
 
   return (
     <>
@@ -108,6 +141,7 @@ export default function Dashboard({ videoId }) {
                 segmentTitle={segment.segmentTitle}
                 startTime={segment.startTime}
                 endTime={segment.endTime}
+                currentTime={currentVIdeoTime}
                 thumbnaillUrl={video.thumbnailUrl}
               />
             ))
@@ -124,10 +158,12 @@ function SegRender({
   segmentTitle,
   startTime,
   endTime,
+  currentTime,
   thumbnaillUrl,
   onClick,
 }) {
   const duration = endTime - startTime;
+  const isPlayingNow = currentTime >= startTime && currentTime <= endTime;
 
   return (
     <>
@@ -135,7 +171,9 @@ function SegRender({
         onClick={onClick}
         // className="group flex flex-row justify-between items-center h-[50px] w-[250px] p-2 m-2 rounded-lg space-x-2 text-white font-mono text-xl scroll-auto hover:bg-red-500 hover:text-black hover:scale-105 transition-all duration-300 ease-in-out">
 
-        className="max-w-md w-[250px] divide-y divide-gray-200 dark:divide-gray-700 border-b border-gray-200 dark:border-gray-700 hover:scale-110 transition-all duration-300 ease-in-out"
+        className={`max-w-md w-[250px] divide-y divide-gray-200 dark:divide-gray-700 border-b border-gray-200 dark:border-gray-700 hover:scale-110 transition-all duration-300 ease-in-out ${
+          isPlayingNow ? "border-2 border-red-500" : ""
+        }`}
       >
         <li className="py-3 sm:py-4">
           <div className="flex items-center space-x-4 rtl:space-x-reverse">
