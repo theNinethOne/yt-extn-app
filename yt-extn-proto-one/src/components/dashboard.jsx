@@ -3,10 +3,14 @@ import { pb } from "../pb";
 import { useSkipToTime } from "../hooks/useSkipToTime";
 import captureImg from "../assets/Capture.jpg";
 import { useGetCurrentTime } from "../hooks/useGetCurrentTime";
+import Navbar from "./navbar";
+import { MdDeleteForever } from "react-icons/md";
+import { FaShare } from "react-icons/fa";
 
 export default function Dashboard({ videoId }) {
   const [video, setVideo] = useState();
   const [segments, setSegments] = useState();
+  const [isAutoPlay, setIsAutoPlay] = useState(false);
   const { skipToTime } = useSkipToTime();
   const { currentVIdeoTime } = useGetCurrentTime();
 
@@ -67,43 +71,48 @@ export default function Dashboard({ videoId }) {
   }
 
   useEffect(() => {
-    skipToNextSegment();
+    if (isAutoPlay) {
+      skipToNextSegment();
+    }
   }, [currentVIdeoTime]);
 
   return (
     <>
-      <div>
+      <div className="flex flex-col justify-center items-center">
         <div>
-          {video ? (
-            <div className="text-xl font-bold m-1 p-2">{video.videoTitle}</div>
-          ) : (
-            <div>Loading...</div>
-          )}
-          <div className="flex flex-row justify-between items-center p-1 m-1 text-sm">
-            <p>This video is segmented by You & </p>
-            <div class="flex -space-x-4 rtl:space-x-reverse">
-              <img
-                class="w-10 h-10 border-2 border-white rounded-full dark:border-gray-800"
-                src={captureImg}
-                alt=""
-              />
-              <img
-                class="w-10 h-10 border-2 border-white rounded-full dark:border-gray-800"
-                src={captureImg}
-                alt=""
-              />
-              <img
-                class="w-10 h-10 border-2 border-white rounded-full dark:border-gray-800"
-                src={captureImg}
-                alt=""
-              />
-              <img
-                class="w-10 h-10 border-2 border-white rounded-full dark:border-gray-800"
-                src={captureImg}
-                alt=""
-              />
+          <div>
+            {video ? (
+              <div className="text-xl font-bold m-1 p-2">
+                {video.videoTitle}
+              </div>
+            ) : (
+              <div>Loading...</div>
+            )}
+            <div className="flex flex-row justify-between items-center p-1 m-1 text-sm">
+              <p>This video is segmented by You & </p>
+              <div class="flex -space-x-4 rtl:space-x-reverse">
+                <img
+                  class="w-10 h-10 border-2 border-white rounded-full dark:border-gray-800"
+                  src={captureImg}
+                  alt=""
+                />
+                <img
+                  class="w-10 h-10 border-2 border-white rounded-full dark:border-gray-800"
+                  src={captureImg}
+                  alt=""
+                />
+                <img
+                  class="w-10 h-10 border-2 border-white rounded-full dark:border-gray-800"
+                  src={captureImg}
+                  alt=""
+                />
+                <img
+                  class="w-10 h-10 border-2 border-white rounded-full dark:border-gray-800"
+                  src={captureImg}
+                  alt=""
+                />
 
-              {/* <img
+                {/* <img
                 class="w-10 h-10 border-2 border-white rounded-full dark:border-gray-800"
                 src={captureImg}
                 alt=""
@@ -118,37 +127,56 @@ export default function Dashboard({ videoId }) {
                 src={captureImg}
                 alt=""
               /> */}
-              <a
-                class="flex items-center justify-center w-10 h-10 text-xs font-medium text-white bg-gray-700 border-2 border-white rounded-full hover:bg-gray-600 dark:border-gray-800"
-                href="#"
-              >
-                +99
-              </a>
+                <a
+                  class="flex items-center justify-center w-10 h-10 text-xs font-medium text-white bg-gray-700 border-2 border-white rounded-full hover:bg-gray-600 dark:border-gray-800"
+                  href="#"
+                >
+                  +99
+                </a>
+              </div>
+              <p>others..</p>
             </div>
-            <p>others..</p>
+          </div>
+
+          <div>
+            <label class="inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                value=""
+                class="sr-only peer"
+                onClick={() => {
+                  setIsAutoPlay(!isAutoPlay);
+                }}
+              />
+              <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-600"></div>
+              <span class="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+                {isAutoPlay ? "Auto Play" : "Manual Play"}
+              </span>
+            </label>
+          </div>
+
+          <div className="flex flex-col justify-center items-center">
+            {segments ? (
+              segments.map((segment) => (
+                <SegRender
+                  onClick={() => {
+                    skipToTime(segment.startTime);
+                  }}
+                  key={segment.id}
+                  segmentTitle={segment.segmentTitle}
+                  startTime={segment.startTime}
+                  endTime={segment.endTime}
+                  currentTime={currentVIdeoTime}
+                  thumbnaillUrl={video.thumbnailUrl}
+                />
+              ))
+            ) : (
+              <div>Loading...</div>
+            )}
           </div>
         </div>
-        <div className="flex flex-col justify-center items-center">
-          {segments ? (
-            segments.map((segment) => (
-              <SegRender
-                onClick={() => {
-                  console.log("c1");
-                  skipToTime(segment.startTime);
-                  console.log("c2");
-                }}
-                key={segment.id}
-                segmentTitle={segment.segmentTitle}
-                startTime={segment.startTime}
-                endTime={segment.endTime}
-                currentTime={currentVIdeoTime}
-                thumbnaillUrl={video.thumbnailUrl}
-              />
-            ))
-          ) : (
-            <div>Loading...</div>
-          )}
-        </div>
+
+        <Navbar />
       </div>
     </>
   );
@@ -169,21 +197,19 @@ function SegRender({
     <>
       <div
         onClick={onClick}
-        // className="group flex flex-row justify-between items-center h-[50px] w-[250px] p-2 m-2 rounded-lg space-x-2 text-white font-mono text-xl scroll-auto hover:bg-red-500 hover:text-black hover:scale-105 transition-all duration-300 ease-in-out">
-
         className={`max-w-md w-[250px] divide-y divide-gray-200 dark:divide-gray-700 border-b border-gray-200 dark:border-gray-700 hover:scale-110 transition-all duration-300 ease-in-out ${
-          isPlayingNow ? "border-2 border-red-500" : ""
+          isPlayingNow ? "bg-red-500" : ""
         }`}
       >
         <li className="py-3 sm:py-4">
           <div className="flex items-center space-x-4 rtl:space-x-reverse">
-            <div className="shrink-0">
+            {/* <div className="shrink-0">
               <img
                 className="w-8 h-8 rounded-full"
                 src={`${thumbnaillUrl}`}
                 alt="Thumbnail image"
               />
-            </div>
+            </div> */}
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-gray-900 truncate dark:text-white">
                 {segmentTitle}
@@ -194,6 +220,12 @@ function SegRender({
             </div>
             <div className="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
               {startTime} sec
+            </div>
+            <div>
+              <FaShare size={20} />
+            </div>
+            <div>
+              <MdDeleteForever size={20} />
             </div>
           </div>
         </li>
