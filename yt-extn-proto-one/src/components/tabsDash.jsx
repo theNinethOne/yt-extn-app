@@ -123,7 +123,7 @@ export default function TabsDash() {
 
   return (
     <>
-      <div className="mb-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="mb-4 border-b border-gray-200 dark:border-gray-700 h-auto">
         <ul className="flex items-center justify-between flex-wrap -mb-px text-sm font-medium text-center">
           <li className="me-1">
             <button
