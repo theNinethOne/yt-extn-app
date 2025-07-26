@@ -8,12 +8,13 @@ import { MdDeleteForever } from "react-icons/md";
 import { FaShare } from "react-icons/fa";
 import SegmentDisp from "./segmentsDisp";
 import Stich from "./stitch";
+import SearchAdd from "./searchAdd";
 
 export default function Dashboard({ videoId }) {
   const [video, setVideo] = useState();
   const [segments, setSegments] = useState();
   const [isAutoPlay, setIsAutoPlay] = useState(false);
-  const [ currentDisp, setCurrentDisp ] = useState("segments")
+  const [currentDisp, setCurrentDisp] = useState("segments");
   const { skipToTime } = useSkipToTime();
   const { currentVIdeoTime } = useGetCurrentTime();
 
@@ -178,16 +179,34 @@ export default function Dashboard({ videoId }) {
             )}
           </div>
         </div> */}
-<div className="m-1">
+        <div className="m-1">
+          {currentDisp === "segments" && (
+            <SegmentDisp
+              video={video}
+              segments={segments}
+              currentVIdeoTime={currentVIdeoTime}
+              skipToTime={skipToTime}
+              isAutoPlay={isAutoPlay}
+              setIsAutoPlay={setIsAutoPlay}
+              SegRender={SegRender}
+            />
+          )}
 
-        { currentDisp === "segments" && (<SegmentDisp video={video} segments={segments} currentVIdeoTime={currentVIdeoTime} skipToTime={skipToTime} isAutoPlay={isAutoPlay} setIsAutoPlay={setIsAutoPlay} SegRender={SegRender} />) }
+          {currentDisp === "search" && (
+            <SearchAdd/>
+          )}
 
-        { currentDisp === "search" && (<SegmentDisp video={video} segments={segments} currentVIdeoTime={currentVIdeoTime} skipToTime={skipToTime} isAutoPlay={isAutoPlay} setIsAutoPlay={setIsAutoPlay} SegRender={SegRender} />) }
+          {currentDisp === "stitch" && (
+            <Stich
+              video={video}
+              segments={segments}
+              currentVIdeoTime={currentVIdeoTime}
+              skipToTime={skipToTime}
+            />
+          )}
+        </div>
 
-        { currentDisp === "stitch" && (<Stich video={video} segments={segments} currentVIdeoTime={currentVIdeoTime} skipToTime={skipToTime} />) }
-</div>
-
-<br />
+        <br />
         <Navbar currentDisp={currentDisp} setCurrentDisp={setCurrentDisp} />
       </div>
     </>
