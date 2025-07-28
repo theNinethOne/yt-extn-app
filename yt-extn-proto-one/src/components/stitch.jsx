@@ -1,52 +1,15 @@
 import { useState } from "react";
 import { pb } from "../pb";
 
-
-export default function Stich({ video, segments, currentVIdeoTime }) {
-  const [stich, setStich] = useState([]);
+export default function Stich({
+  video,
+  segments,
+  currentVIdeoTime,
+  setCurrentDisp
+}) {
   const [startTimings, setStartTimiings] = useState([]);
   const [endTimings, setEndTimiings] = useState([]);
-
-  const addStichHandler = async () => {
-    console.log(stich);
-    console.log(startTimings);
-    console.log(endTimings);
-
-    const stichData = {
-      createdBy: pb.authStore.record.id,
-      originalVideo: video.id,
-      startTimings: startTimings.toString(),
-      endTimings: `${endTimings}`,
-      videoDuration: video.videoDuration,
-    };
-
-    try {
-
-        console.log(stichData)
-        
-      const res = await pb.collection("stich").create(stichData);
-
-      console.log("Stich added successfully, stichId : ", res.id);
-
-      const stichShareData = {
-        stichId: res.id,
-        user: pb.authStore.record.id,
-      };
-
-      try {
-        console.log(stichShareData);
-
-        await pb.collection("stichShare").create(stichShareData);
-
-        console.log("Stich share added successfully");
-      } catch (error) {
-        console.error(error);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-
-  };
+  const [addStichModal, setAddStichModal] = useState(false);
 
   return (
     <>
@@ -68,13 +31,9 @@ export default function Stich({ video, segments, currentVIdeoTime }) {
                   onChange={(e) => {
                     console.log(e.target.checked);
                     if (e.target.checked) {
-                      setStich((prev) => [...prev, segment.id]);
                       setStartTimiings((prev) => [...prev, segment.startTime]);
                       setEndTimiings((prev) => [...prev, segment.endTime]);
                     } else {
-                      setStich((prev) =>
-                        prev.filter((id) => id !== segment.id)
-                      );
                       setStartTimiings((prev) =>
                         prev.filter((id) => id !== segment.startTime)
                       );
@@ -102,16 +61,17 @@ export default function Stich({ video, segments, currentVIdeoTime }) {
             <div>Loading...</div>
           )}
         </div>
-
-        <div>
-          <button
-            className="p-2 rounded-lg m-2 bg-red-500 text-white hover:bg-red-600 hover:scale-110 transition-all duration-300 ease-in-out"
-            onClick={addStichHandler}
-          >
-            Stich
-          </button>
-        </div>
       </div>
+
+      <AddStichModal
+        setAddStichModal={setAddStichModal}
+        createdBy={pb.authStore.record.id}
+        originalVideo={video.id}
+        startTimings={startTimings.toString()}
+        endTimings={`${endTimings}`}
+        videoDuration={video.videoDuration}
+        setCurrentDisp={setCurrentDisp}
+      />
     </>
   );
 }
@@ -141,6 +101,99 @@ function SelectSegRender({ segmentTitle, startTime, endTime, onClick }) {
           </div>
         </li>
       </div>
+    </>
+  );
+}
+
+function AddStichModal(
+  createdBy,
+  originalVideo,
+  startTimings,
+  endTimings,
+  videoDuration,
+  setCurrentDisp
+) {
+  const [stichName, setStichName] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const addStichHandler = async () => {
+    console.log(startTimings);
+    console.log(endTimings);
+
+    const stichData = {
+      createdBy: createdBy,
+      originalVideo: originalVideo,
+      startTimings: startTimings,
+      endTimings: endTimings,
+      videoDuration: videoDuration,
+      stichName: stichName,
+    };
+
+    try {
+      console.log(stichData);
+
+      const res = await pb.collection("stich").create(stichData);
+
+      console.log("Stich added successfully, stichId : ", res.id);
+
+      const stichShareData = {
+        stichId: res.id,
+        user: pb.authStore.record.id,
+      };
+
+      try {
+        console.log(stichShareData);
+
+        await pb.collection("stichShare").create(stichShareData);
+
+        console.log("Stich share added successfully");
+      } catch (error) {
+        console.error(error);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
+    // setCurrentDisp("search");
+    setIsOpen(false);
+  };
+  
+  return (
+    <>
+      <button
+        className="p-2 rounded-lg m-2 bg-red-500 text-white 
+                        hover:bg-red-600 hover:scale-110 transition-all duration-300 ease-in-out"
+        onClick={() => setIsOpen(true)}
+      >
+        Stich
+      </button>
+
+      {isOpen && (
+        <div className="fixed bg-black inset-0 bg-opacity-50 flex items-center justify-center z-40 flex-col">
+          <input
+            type="text"
+            placeholder="Stich Name"
+            className="h-[100px] w-[250px] rounded-lg border-2 border-red-500"
+            onChange={(e) => setStichName(e.target.value)}
+          />
+          <div className="flex flex-row justify-center items-center p-1 m-1 space-x-2">
+            <button
+              className="bg-red-500 p-2 rounded-lg m-2 w-[100px] h-[50px] text-white 
+            hover:scale-110 transition-all duration-300 ease-in-out"
+              onClick={() => setIsOpen(false)}
+            >
+              Close
+            </button>
+            <button
+              className="bg-red-500 p-2 rounded-lg m-2 w-[100px] h-[50px] text-white 
+            hover:scale-110 transition-all duration-300 ease-in-out"
+              onClick={() => addStichHandler()}
+            >
+              Add
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }

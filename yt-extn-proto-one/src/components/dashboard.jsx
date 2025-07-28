@@ -201,6 +201,7 @@ export default function Dashboard({ videoId }) {
               video={video}
               segments={segments}
               currentVIdeoTime={currentVIdeoTime}
+              setCurrentDisp={setCurrentDisp}
               skipToTime={skipToTime}
             />
           )}
