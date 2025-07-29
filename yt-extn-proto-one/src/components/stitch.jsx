@@ -9,7 +9,6 @@ export default function Stich({
 }) {
   const [startTimings, setStartTimiings] = useState([]);
   const [endTimings, setEndTimiings] = useState([]);
-  const [addStichModal, setAddStichModal] = useState(false);
 
   return (
     <>
@@ -64,13 +63,12 @@ export default function Stich({
       </div>
 
       <AddStichModal
-        setAddStichModal={setAddStichModal}
-        createdBy={pb.authStore.record.id}
+        createdBy={pb.authStore.record?.id}
         originalVideo={video.id}
         startTimings={startTimings.toString()}
         endTimings={`${endTimings}`}
         videoDuration={video.videoDuration}
-        setCurrentDisp={setCurrentDisp}
+
       />
     </>
   );
@@ -106,12 +104,12 @@ function SelectSegRender({ segmentTitle, startTime, endTime, onClick }) {
 }
 
 function AddStichModal(
-  createdBy,
+  {createdBy,
   originalVideo,
   startTimings,
   endTimings,
-  videoDuration,
-  setCurrentDisp
+  videoDuration}
+
 ) {
   const [stichName, setStichName] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -130,11 +128,13 @@ function AddStichModal(
     };
 
     try {
-      console.log(stichData);
+      console.log("stichData",stichData);
 
       const res = await pb.collection("stich").create(stichData);
 
       console.log("Stich added successfully, stichId : ", res.id);
+
+      console.log("res", res)
 
       const stichShareData = {
         stichId: res.id,
@@ -157,7 +157,7 @@ function AddStichModal(
     // setCurrentDisp("search");
     setIsOpen(false);
   };
-  
+
   return (
     <>
       <button

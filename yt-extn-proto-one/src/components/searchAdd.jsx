@@ -16,6 +16,7 @@ export default function SearchAdd() {
     );
 
     setStichDetails(details);
+    console.log("details", details);
   };
 
   useEffect(() => {
